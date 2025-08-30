@@ -11,6 +11,20 @@ export const metadata: Metadata = {
   description:
     "A powerful dashboard that helps educators track student progress across attendance, grades, and behavior—so you can support every learner's journey.",
   generator: "ProgressLens",
+  robots: "index, follow",
+  authors: [{ name: "ProgressLens Team" }],
+  keywords: [
+    "education",
+    "student progress",
+    "early warning",
+    "dashboard",
+    "analytics",
+  ],
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
