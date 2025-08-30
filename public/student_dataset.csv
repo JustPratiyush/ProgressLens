@@ -1,0 +1,24 @@
+id,name,email,class,riskLevel,riskScore,attendance,averageGrade,lastActivity
+s-001,Alex Johnson,alex.johnson@example.edu,10A,warning,62,86,72,2025-08-30T09:50:51.927Z
+s-002,Priya Patel,priya.patel@example.edu,11B,safe,18,96,89,2025-08-30T09:50:51.927Z
+s-003,Marcus Lee,marcus.lee@example.edu,12C,critical,88,72,61,2025-08-30T09:50:51.927Z
+s-004,Isabella White,isabella.white@example.edu,12C,safe,39,43,55,2025-08-17T09:50:51Z
+s-005,Amelia Hall,amelia.hall@example.edu,12A,warning,67,54,94,2025-08-30T09:50:51Z
+s-006,Sophia Clark,sophia.clark@example.edu,11B,warning,84,23,78,2025-07-31T09:50:51Z
+s-007,Sophia Khan,sophia.khan@example.edu,12A,critical,87,26,97,2025-08-03T09:50:51Z
+s-008,Raj Martin,raj.martin@example.edu,11A,safe,14,59,97,2025-08-13T09:50:51Z
+s-009,Raj Thomas,raj.thomas@example.edu,12B,critical,25,72,54,2025-08-21T09:50:51Z
+s-010,Daniel White,daniel.white@example.edu,12B,warning,59,96,71,2025-08-28T09:50:51Z
+s-011,Isabella Anderson,isabella.anderson@example.edu,12B,safe,54,12,65,2025-07-31T09:50:51Z
+s-012,Daniel Walker,daniel.walker@example.edu,10A,warning,64,19,98,2025-08-21T09:50:51Z
+s-013,John Patel,john.patel@example.edu,12B,safe,57,86,52,2025-08-19T09:50:51Z
+s-014,Olivia Sharma,olivia.sharma@example.edu,10A,safe,71,44,73,2025-08-10T09:50:51Z
+s-015,Nathan Khan,nathan.khan@example.edu,10B,safe,86,96,89,2025-08-08T09:50:51Z
+s-016,Olivia Lewis,olivia.lewis@example.edu,11A,warning,16,28,70,2025-08-05T09:50:51Z
+s-017,Arjun Young,arjun.young@example.edu,12C,safe,64,69,71,2025-08-16T09:50:51Z
+s-018,Arjun Hall,arjun.hall@example.edu,12C,warning,23,74,74,2025-08-18T09:50:51Z
+s-019,Emily Wilson,emily.wilson@example.edu,10A,safe,54,84,61,2025-08-01T09:50:51Z
+s-020,Nathan Brown,nathan.brown@example.edu,10B,critical,67,61,80,2025-08-19T09:50:51Z
+s-021,Lucas Singh,lucas.singh@example.edu,10A,warning,52,17,74,2025-08-05T09:50:51Z
+s-022,Chloe Taylor,chloe.taylor@example.edu,10B,safe,69,72,88,2025-08-02T09:50:51Z
+s-023,Ethan Martin,ethan.martin@example.edu,12B,warning,33,34,61,2025-08-03T09:50:51Z
