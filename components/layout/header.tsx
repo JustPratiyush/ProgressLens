@@ -20,28 +20,46 @@ export function Header() {
         <div className="flex items-center gap-3">
           <AppName />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isLoaded && (
             <>
               {!isSignedIn ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <SignInButton mode="modal">
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+                    >
                       Sign in
                     </Button>
                   </SignInButton>
                   <SignUpButton mode="modal">
-                    <Button size="sm">Sign up</Button>
+                    <Button
+                      size="sm"
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+                    >
+                      Sign up
+                    </Button>
                   </SignUpButton>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 sm:gap-3">
                   <SignOutButton>
-                    <Button variant="destructive" size="sm">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+                    >
                       Sign out
                     </Button>
                   </SignOutButton>
-                  <Button asChild variant="outline" size="sm">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="text-xs sm:text-sm px-2 sm:px-3"
+                  >
                     <Link prefetch href="/dashboard">
                       Dashboard
                     </Link>
@@ -49,7 +67,7 @@ export function Header() {
                   <UserButton
                     appearance={{
                       elements: {
-                        avatarBox: "h-8 w-8",
+                        avatarBox: "h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8",
                       },
                     }}
                   />

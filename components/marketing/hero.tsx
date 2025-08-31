@@ -1,33 +1,38 @@
+"use client";
+
 // components/marketing/hero.tsx
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, TrendingUp, Users, Shield } from "lucide-react";
-import { SignUpButton } from "@clerk/nextjs";
+import { SignUpButton, useUser } from "@clerk/nextjs";
 import Prism from "@/src/blocks/Backgrounds/Prism/Prism";
 
 export function Hero() {
+  const { isSignedIn, isLoaded } = useUser();
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Prism Background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-50">
+      {/* Prism Background - Hidden on mobile for performance */}
+      <div className="absolute inset-0  md:flex items-center justify-center opacity-50">
         <div style={{ width: "100%", height: "100%", position: "relative" }}>
           <Prism
             animationType="rotate"
-            timeScale={0.5}
+            timeScale={0.3}
             height={3.5}
             baseWidth={5.5}
-            scale={3.6}
+            scale={3}
             hueShift={0}
-            colorFrequency={1}
-            noise={0.5}
-            glow={1}
+            colorFrequency={0.8}
+            noise={0.3}
+            glow={0.8}
+            suspendWhenOffscreen={true}
           />
         </div>
       </div>
 
-      {/* Background decoration */}
+      {/* Mobile-friendly background decoration */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-muted/5 to-transparent" />
 
@@ -62,30 +67,48 @@ export function Hero() {
 
           {/* CTA Buttons */}
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <SignUpButton mode="modal">
+            {isLoaded && !isSignedIn && (
+              <SignUpButton mode="modal">
+                <Button
+                  size="lg"
+                  className="group px-8 py-6 text-lg font-semibold shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+                >
+                  <span className="flex items-center">
+                    Get started free
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Button>
+              </SignUpButton>
+            )}
+            {isLoaded && isSignedIn && (
               <Button
+                asChild
                 size="lg"
                 className="group px-8 py-6 text-lg font-semibold shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
               >
-                <span className="flex items-center">
-                  Get started free
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </span>
+                <a href="/dashboard">
+                  <span className="flex items-center">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </a>
               </Button>
-            </SignUpButton>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="px-8 py-6 text-lg font-medium border-2 hover:bg-muted/50"
-            >
-              <a href="/sign-in">Sign in</a>
-            </Button>
+            )}
+            {isLoaded && !isSignedIn && (
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="px-8 py-6 text-lg font-medium border-2 hover:bg-muted/50"
+              >
+                <a href="/sign-in">Sign in</a>
+              </Button>
+            )}
           </div>
 
           {/* Feature highlights */}
           <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm">
+            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm  opacity-90">
               <CardContent className="p-6 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <TrendingUp className="h-6 w-6 text-primary" />
@@ -97,7 +120,7 @@ export function Hero() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm">
+            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm opacity-90">
               <CardContent className="p-6 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Users className="h-6 w-6 text-primary" />
@@ -109,7 +132,7 @@ export function Hero() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm">
+            <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm opacity-90">
               <CardContent className="p-6 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Shield className="h-6 w-6 text-primary" />

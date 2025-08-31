@@ -7,8 +7,8 @@ export function AppName() {
       <Image
         src={"./ProgressLens.svg"}
         alt="ProgressLens Logo"
-        width={200}
-        height={200}
+        width={180}
+        height={180}
         className="dark:invert dark:brightness-0 dark:contrast-200"
       />
     </Link>
