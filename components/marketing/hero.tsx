@@ -5,10 +5,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight, TrendingUp, Users, Shield } from "lucide-react";
 import { SignUpButton } from "@clerk/nextjs";
+import Prism from "@/src/blocks/Backgrounds/Prism/Prism";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Prism Background */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-50">
+        <div style={{ width: "100%", height: "100%", position: "relative" }}>
+          <Prism
+            animationType="rotate"
+            timeScale={0.5}
+            height={3.5}
+            baseWidth={5.5}
+            scale={3.6}
+            hueShift={0}
+            colorFrequency={1}
+            noise={0.5}
+            glow={1}
+          />
+        </div>
+      </div>
+
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-muted/5 to-transparent" />

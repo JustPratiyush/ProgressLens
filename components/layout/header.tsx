@@ -42,7 +42,9 @@ export function Header() {
                     </Button>
                   </SignOutButton>
                   <Button asChild variant="outline" size="sm">
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link prefetch href="/dashboard">
+                      Dashboard
+                    </Link>
                   </Button>
                   <UserButton
                     appearance={{
