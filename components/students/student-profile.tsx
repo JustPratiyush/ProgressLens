@@ -1,11 +1,19 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { RiskIndicator } from "./risk-indicator"
-import type { Student } from "@/lib/types/student"
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { RiskIndicator } from "./risk-indicator";
+import type { Student } from "@/lib/types/student";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function StudentProfile({
   loading,
@@ -13,19 +21,22 @@ export function StudentProfile({
   student,
   onRefresh,
 }: {
-  loading: boolean
-  error: boolean
-  student?: Student
-  onRefresh?: () => void
+  loading: boolean;
+  error: boolean;
+  student?: Student;
+  onRefresh?: () => void;
 }) {
-  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>
-  if (error || !student) return <p className="text-sm text-muted-foreground">Could not load student.</p>
+  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (error || !student)
+    return (
+      <p className="text-sm text-muted-foreground">Could not load student.</p>
+    );
 
   const trendData = [
     { name: "W1", score: Math.max(0, student.averageGrade - 6) },
     { name: "W2", score: Math.max(0, student.averageGrade - 3) },
     { name: "W3", score: student.averageGrade },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -59,7 +70,13 @@ export function StudentProfile({
                 <XAxis dataKey="name" />
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
-                <Line type="monotone" dataKey="score" stroke="#1d4ed8" strokeWidth={2} dot />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#1d4ed8"
+                  strokeWidth={2}
+                  dot
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -72,12 +89,17 @@ export function StudentProfile({
         </CardHeader>
         <CardContent>
           {student.interventions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No interventions yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No interventions yet.
+            </p>
           ) : (
             <ul className="space-y-3">
               {student.interventions.map((i) => (
                 <li key={i.id} className="text-sm">
-                  <span className="font-medium">{new Date(i.date).toLocaleString()}:</span> <span>{i.note}</span>
+                  <span className="font-medium">
+                    {new Date(i.date).toLocaleString()}:
+                  </span>{" "}
+                  <span>{i.note}</span>
                 </li>
               ))}
             </ul>
@@ -86,11 +108,20 @@ export function StudentProfile({
             <Button variant="outline" onClick={onRefresh}>
               Add note (MVP placeholder)
             </Button>
-            <Button variant="outline">Schedule meeting</Button>
+            <Button variant="outline" asChild>
+              <Link
+                href="https://meet.google.com/landing"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Schedule meeting
+              </Link>
+            </Button>
+
             <Button>Mark intervention</Button>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
