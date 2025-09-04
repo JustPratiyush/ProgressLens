@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { sendEmail, sendLowAttendanceEmail } from "@/lib/resend";
 
 export function StudentProfile({
   loading,
@@ -116,6 +117,29 @@ export function StudentProfile({
               >
                 Schedule meeting
               </Link>
+            </Button>
+
+            <Button
+              onClick={() =>
+                sendLowAttendanceEmail({
+                  to: "omkarpadalkar21@gmail.com",
+                  name: student.name,
+                  attendance: student.attendance,
+                  className: student.class,
+                })
+              }
+            >
+              {/* <Link
+                href={`mailto:${student.email}?subject=${encodeURIComponent(
+                  "Check-in"
+                )}&body=${encodeURIComponent(
+                  `Hi ${student.name},\n\nJust checking in.\n\n—`
+                )}`}
+                aria-label={`Email ${student.name}`}
+              >
+                Email student
+              </Link> */}
+              Email student
             </Button>
 
             <Button>Mark intervention</Button>
