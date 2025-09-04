@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { sendEmail, sendLowAttendanceEmail } from "@/lib/resend";
 
 export function StudentProfile({
   loading,
@@ -120,14 +119,18 @@ export function StudentProfile({
             </Button>
 
             <Button
-              onClick={() =>
-                sendLowAttendanceEmail({
-                  to: "omkarpadalkar21@gmail.com",
-                  name: student.name,
-                  attendance: student.attendance,
-                  className: student.class,
-                })
-              }
+              onClick={async () => {
+                await fetch("/api/email", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    to: "omkarpadalkar21@gmail.com",
+                    name: student.name,
+                    attendance: student.attendance,
+                    className: student.class,
+                  }),
+                });
+              }}
             >
               {/* <Link
                 href={`mailto:${student.email}?subject=${encodeURIComponent(
