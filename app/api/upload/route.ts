@@ -16,14 +16,11 @@ export async function POST(req: Request) {
       );
     }
 
-    let processed = 0;
-
     if (replaceAll) {
-      // Clear existing data and upload new data
       await clearAllStudents();
     }
 
-    processed = await bulkUpsertStudents(rows, mapping);
+    const processed = await bulkUpsertStudents(rows, mapping);
 
     return NextResponse.json({
       processed,

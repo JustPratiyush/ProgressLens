@@ -1,37 +1,31 @@
 import type { DashboardSummary } from "@/lib/types/dashboard";
 import type { Student } from "@/lib/types/student";
+import { connectDB } from "@/lib/database";
+import StudentModel from "@/lib/database/models/student";
 
-// Start with empty array - data will be populated dynamically from CSV uploads
-let STUDENTS: Student[] = [];
-
-function computeSummary(): DashboardSummary {
-  const total = STUDENTS.length;
-  const atRisk = STUDENTS.filter((s) => s.riskLevel !== "safe").length;
-  const critical = STUDENTS.filter((s) => s.riskLevel === "critical").length;
+function computeSummaryFromDocs(docs: any[]): DashboardSummary {
+  const total = docs.length;
+  const atRisk = docs.filter((s) => s.riskLevel !== "safe").length;
+  const critical = docs.filter((s) => s.riskLevel === "critical").length;
   const riskDistribution = [
-    {
-      level: "safe",
-      count: STUDENTS.filter((s) => s.riskLevel === "safe").length,
-    },
+    { level: "safe", count: docs.filter((s) => s.riskLevel === "safe").length },
     {
       level: "warning",
-      count: STUDENTS.filter((s) => s.riskLevel === "warning").length,
+      count: docs.filter((s) => s.riskLevel === "warning").length,
     },
     {
       level: "critical",
-      count: STUDENTS.filter((s) => s.riskLevel === "critical").length,
+      count: docs.filter((s) => s.riskLevel === "critical").length,
     },
   ];
-  const recentAlerts = STUDENTS.filter((s) => s.riskLevel !== "safe")
+  const recentAlerts = docs
+    .filter((s) => s.riskLevel !== "safe")
     .slice(0, 5)
     .map((s, i) => ({
       id: `a-${i}`,
       studentId: s.id,
       message: `${s.name} marked as ${s.riskLevel} (score ${s.riskScore})`,
-      level:
-        s.riskLevel === "critical"
-          ? "critical"
-          : ("warning" as "warning" | "critical"),
+      level: s.riskLevel === "critical" ? "critical" : ("warning" as const),
       date: new Date().toISOString(),
     }));
   return {
@@ -44,21 +38,59 @@ function computeSummary(): DashboardSummary {
 }
 
 export async function getDashboardSummary() {
-  return computeSummary();
+  await connectDB();
+  const docs = await StudentModel.find({}).lean();
+  return computeSummaryFromDocs(docs as any[]);
 }
 
-export async function listStudents() {
-  return STUDENTS;
+export async function listStudents(): Promise<Student[]> {
+  await connectDB();
+  const docs = await StudentModel.find({}).sort({ createdAt: -1 }).lean();
+  // lastActivity already converted to ISO in schema toJSON, but lean() bypasses it; normalize here
+  return docs.map((d: any) => ({
+    id: d.id,
+    name: d.name,
+    email: d.email ?? "",
+    class: d.class ?? "",
+    riskLevel: d.riskLevel,
+    riskScore: d.riskScore ?? 0,
+    attendance: d.attendance ?? 0,
+    averageGrade: d.averageGrade ?? 0,
+    lastActivity: d.lastActivity
+      ? new Date(d.lastActivity).toISOString()
+      : new Date().toISOString(),
+    mentor: d.mentor,
+    interventions: d.interventions ?? [],
+  }));
 }
 
-export async function getStudentById(id: string) {
-  return STUDENTS.find((s) => s.id === id);
+export async function getStudentById(id: string): Promise<Student | null> {
+  await connectDB();
+  const d = await StudentModel.findOne({ id }).lean();
+  if (!d) return null;
+  return {
+    id: d.id,
+    name: d.name,
+    email: d.email ?? "",
+    class: d.class ?? "",
+    riskLevel: d.riskLevel as any,
+    riskScore: d.riskScore ?? 0,
+    attendance: d.attendance ?? 0,
+    averageGrade: d.averageGrade ?? 0,
+    lastActivity: d.lastActivity
+      ? new Date(d.lastActivity).toISOString()
+      : new Date().toISOString(),
+    mentor: (d as any).mentor,
+    interventions: (d as any).interventions ?? [],
+  };
 }
 
-export async function createStudent(payload: Partial<Student>) {
-  const id = `s-${Math.random().toString(36).slice(2, 8)}`;
-  const now = new Date().toISOString();
-  const s: Student = {
+export async function createStudent(
+  payload: Partial<Student>
+): Promise<Student> {
+  await connectDB();
+  const id = payload.id || `s-${Math.random().toString(36).slice(2, 8)}`;
+  const doc = await StudentModel.create({
     id,
     name: payload.name || "Unnamed",
     email: payload.email || "",
@@ -67,64 +99,91 @@ export async function createStudent(payload: Partial<Student>) {
     riskScore: payload.riskScore ?? 0,
     attendance: payload.attendance ?? 0,
     averageGrade: payload.averageGrade ?? 0,
-    lastActivity: now,
+    lastActivity: payload.lastActivity
+      ? new Date(payload.lastActivity)
+      : new Date(),
     mentor: payload.mentor,
     interventions: payload.interventions ?? [],
+  });
+  const d: any = doc.toObject();
+  return {
+    id: d.id,
+    name: d.name,
+    email: d.email ?? "",
+    class: d.class ?? "",
+    riskLevel: d.riskLevel,
+    riskScore: d.riskScore ?? 0,
+    attendance: d.attendance ?? 0,
+    averageGrade: d.averageGrade ?? 0,
+    lastActivity: new Date(d.lastActivity).toISOString(),
+    mentor: d.mentor,
+    interventions: d.interventions ?? [],
   };
-  STUDENTS.unshift(s);
-  return s;
 }
 
 export async function updateStudent(id: string, updates: Partial<Student>) {
-  const idx = STUDENTS.findIndex((s) => s.id === id);
-  if (idx === -1) return null;
-  const merged = {
-    ...STUDENTS[idx],
-    ...updates,
-    lastActivity: new Date().toISOString(),
+  await connectDB();
+  const d = await StudentModel.findOneAndUpdate(
+    { id },
+    {
+      ...updates,
+      lastActivity: updates.lastActivity
+        ? new Date(updates.lastActivity)
+        : new Date(),
+    },
+    { new: true }
+  ).lean();
+  if (!d) return null;
+  return {
+    id: d.id,
+    name: d.name,
+    email: d.email ?? "",
+    class: d.class ?? "",
+    riskLevel: d.riskLevel as any,
+    riskScore: d.riskScore ?? 0,
+    attendance: d.attendance ?? 0,
+    averageGrade: d.averageGrade ?? 0,
+    lastActivity: d.lastActivity
+      ? new Date(d.lastActivity).toISOString()
+      : new Date().toISOString(),
+    mentor: (d as any).mentor,
+    interventions: (d as any).interventions ?? [],
   };
-  STUDENTS[idx] = merged;
-  return merged;
 }
 
 export async function deleteStudent(id: string) {
-  const before = STUDENTS.length;
-  STUDENTS = STUDENTS.filter((s) => s.id !== id);
-  return STUDENTS.length < before;
+  await connectDB();
+  const res = await StudentModel.findOneAndDelete({ id });
+  return !!res;
 }
 
 export async function clearAllStudents() {
-  const count = STUDENTS.length;
-  STUDENTS = [];
-  return count;
+  await connectDB();
+  const res = await StudentModel.deleteMany({});
+  return res.deletedCount ?? 0;
 }
 
 export async function getStudentCount() {
-  return STUDENTS.length;
+  await connectDB();
+  return StudentModel.countDocuments();
 }
 
 export async function bulkUpsertStudents(
   rows: Record<string, string>[],
   mapping: Record<string, string>
 ) {
+  await connectDB();
   let processed = 0;
-
-  // Clear existing data if this is a fresh upload
-  if (STUDENTS.length === 0) {
-    STUDENTS = [];
-  }
 
   for (const row of rows) {
     const name = row[mapping.name];
     if (!name) continue;
 
     const email = row[mapping.email] || "";
-    const existing = STUDENTS.find(
-      (s) => s.email && s.email.toLowerCase() === email.toLowerCase()
-    );
+    const candidateId = row["id"] || undefined;
 
-    // Parse the data with proper type conversion and validation
     const payload: Partial<Student> = {
+      id: candidateId,
       name,
       email,
       class: row[mapping.class] || "",
@@ -133,13 +192,11 @@ export async function bulkUpsertStudents(
       averageGrade: Number(row[mapping.averageGrade] ?? 0),
     };
 
-    // Use existing riskLevel if available, otherwise calculate from riskScore
     if (row[mapping.riskLevel]) {
       const riskLevel = row[mapping.riskLevel].toLowerCase();
       if (["safe", "warning", "critical"].includes(riskLevel)) {
-        payload.riskLevel = riskLevel as "safe" | "warning" | "critical";
+        payload.riskLevel = riskLevel as any;
       } else {
-        // Fallback calculation if riskLevel is invalid
         payload.riskLevel =
           (payload.riskScore ?? 0) >= 75
             ? "critical"
@@ -148,7 +205,6 @@ export async function bulkUpsertStudents(
             : "safe";
       }
     } else {
-      // Fallback calculation if riskLevel is not provided
       payload.riskLevel =
         (payload.riskScore ?? 0) >= 75
           ? "critical"
@@ -157,34 +213,45 @@ export async function bulkUpsertStudents(
           : "safe";
     }
 
-    // Handle lastActivity if available
     if (row[mapping.lastActivity]) {
-      try {
-        const date = new Date(row[mapping.lastActivity]);
-        if (!isNaN(date.getTime())) {
-          payload.lastActivity = date.toISOString();
-        } else {
-          payload.lastActivity = new Date().toISOString();
-        }
-      } catch (e) {
-        // If date parsing fails, use current time
-        payload.lastActivity = new Date().toISOString();
-      }
+      const d = new Date(row[mapping.lastActivity]);
+      payload.lastActivity = isNaN(d.getTime())
+        ? new Date().toISOString()
+        : d.toISOString();
     } else {
       payload.lastActivity = new Date().toISOString();
     }
 
-    // Add default mentor if not provided
-    if (!payload.mentor) {
-      payload.mentor = "Unassigned";
-    }
+    // Upsert by "id" (preferred), else by email if available, else by name+class
+    const query: any = candidateId
+      ? { id: candidateId }
+      : email
+      ? { email }
+      : { name, class: payload.class };
 
-    if (existing) {
-      await updateStudent(existing.id, payload);
-    } else {
-      await createStudent(payload);
-    }
+    await StudentModel.findOneAndUpdate(
+      query,
+      {
+        $set: {
+          name: payload.name,
+          email: payload.email,
+          class: payload.class,
+          riskLevel: payload.riskLevel,
+          riskScore: payload.riskScore,
+          attendance: payload.attendance,
+          averageGrade: payload.averageGrade,
+          lastActivity: new Date(payload.lastActivity as string),
+        },
+        $setOnInsert: {
+          id: candidateId || `s-${Math.random().toString(36).slice(2, 8)}`,
+          interventions: [],
+        },
+      },
+      { upsert: true, new: true }
+    );
+
     processed++;
   }
+
   return processed;
 }
