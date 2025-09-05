@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { RiskChart } from "@/components/dashboard/risk-chart";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
 
 // Import the new components
@@ -19,18 +20,17 @@ export default function DashboardClient() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {" "}
-        <h1 className="text-2xl font-semibold tracking-tight text-pretty">
-          Dashboard
-        </h1>{" "}
+        <div className="flex items-center gap-3">
+          <SidebarTrigger />
+          <h1 className="text-2xl font-semibold tracking-tight text-pretty">
+            Dashboard
+          </h1>
+        </div>
         <div className="flex items-center gap-2">
-          {" "}
           <Link href="/upload">
-            {" "}
             <Button>Upload Data</Button>
           </Link>
           <Link href="/students">
-            {" "}
             <Button variant="outline">View Students</Button>
           </Link>
         </div>

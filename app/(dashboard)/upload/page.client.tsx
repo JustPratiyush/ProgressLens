@@ -7,6 +7,7 @@ import { DataPreview } from "@/components/upload/data-preview";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 
 type ParsedRow = Record<string, string>;
@@ -102,7 +103,10 @@ export default function UploadClient() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Upload Data</h1>
+      <div className="flex items-center gap-3">
+        <SidebarTrigger />
+        <h1 className="text-2xl font-semibold tracking-tight">Upload Data</h1>
+      </div>
 
       {/* Current Data Summary */}
       {currentData && (
