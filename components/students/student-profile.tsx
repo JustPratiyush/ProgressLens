@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ChatWidget from "../dashboard/ChatWidget";
+import { toast } from "sonner";
 
 export function StudentProfile({
   loading,
@@ -121,7 +122,7 @@ export function StudentProfile({
 
             <Button
               onClick={async () => {
-                await fetch("/api/email", {
+                const promise = fetch("/api/email", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
@@ -131,18 +132,14 @@ export function StudentProfile({
                     className: student.class,
                   }),
                 });
+
+                toast.promise(promise, {
+                  loading: "Sending email...",
+                  success: "Email sent successfully",
+                  error: "Failed to send email",
+                });
               }}
             >
-              {/* <Link
-                href={`mailto:${student.email}?subject=${encodeURIComponent(
-                  "Check-in"
-                )}&body=${encodeURIComponent(
-                  `Hi ${student.name},\n\nJust checking in.\n\n—`
-                )}`}
-                aria-label={`Email ${student.name}`}
-              >
-                Email student
-              </Link> */}
               Email student
             </Button>
 
