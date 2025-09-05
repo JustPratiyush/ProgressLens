@@ -11,14 +11,14 @@ import { cn } from "@/lib/utils";
 
 const outliers = [
   {
-    name: "Jessica Chen",
+    name: "Jyoti Chandra",
     initials: "JC",
     reason: "Excels in self-study despite low class participation.",
     type: "Academic Anomaly",
     tags: ["Low Attendance", "High Marks"],
   },
   {
-    name: "Michael Rao",
+    name: "Manish Reddy",
     initials: "MR",
     reason:
       "Founder of a startup with $500k funding. Low engagement in class but exceptional real-world performance.",
@@ -26,7 +26,7 @@ const outliers = [
     tags: ["Low Marks", "Founder"],
   },
   {
-    name: "Priya Singh",
+    name: "Priya Sharma",
     initials: "PS",
     reason:
       "Working a remote job ($100k/year) as a software developer. Contributes to open-source projects.",
