@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import ChatWidget from "../dashboard/ChatWidget";
 
 export function StudentProfile({
   loading,
@@ -149,6 +150,7 @@ export function StudentProfile({
           </div>
         </CardContent>
       </Card>
+      <ChatWidget />
     </div>
   );
 }
