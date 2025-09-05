@@ -6,9 +6,9 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed bottom-4 right-4 z-50">
       {open && (
-        <div className="w-[380px] h-[560px] bg-white rounded-2xl shadow-lg border overflow-hidden mb-2 flex flex-col">
+        <div className="absolute bottom-16 right-0 w-[380px] h-[560px] bg-white rounded-2xl shadow-lg border overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-3 py-2 bg-gray-100 border-b">
             <span className="font-semibold text-sm">Chat</span>
             <button onClick={() => setOpen(false)}>
@@ -24,7 +24,7 @@ export default function ChatWidget() {
 
       <button
         onClick={() => setOpen(!open)}
-        className="p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition"
+        className="p-3 rounded-lg bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition"
       >
         <MessageCircle size={22} />
       </button>

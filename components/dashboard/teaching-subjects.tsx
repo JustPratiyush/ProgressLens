@@ -60,7 +60,7 @@ export function TeachingSubjects({
       <CardHeader>
         <CardTitle className="text-base">My Teaching Subjects</CardTitle>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>

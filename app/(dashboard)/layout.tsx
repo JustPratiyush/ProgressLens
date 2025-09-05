@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/layout/sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import ChatWidget from "@/components/dashboard/ChatWidget";
 
 export default async function DashboardLayout({
   children,
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
           </main>
         </div>
       </SidebarInset>
+      <ChatWidget />
     </SidebarProvider>
   );
 }

@@ -46,6 +46,7 @@ export function RiskChart({
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Tooltip
+                  wrapperStyle={{ zIndex: 9999 }}
                   formatter={(value: number, name: any) => [
                     value,
                     name && typeof name === "string"

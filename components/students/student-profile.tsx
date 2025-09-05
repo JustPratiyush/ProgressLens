@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import ChatWidget from "../dashboard/ChatWidget";
 import { toast } from "sonner";
 
 export function StudentProfile({
@@ -147,7 +146,6 @@ export function StudentProfile({
           </div>
         </CardContent>
       </Card>
-      <ChatWidget />
     </div>
   );
 }
