@@ -9,7 +9,18 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useContext } from "react";
+
+function ConditionalSidebarTrigger() {
+  try {
+    useSidebar();
+    return <SidebarTrigger />;
+  } catch {
+    return null;
+  }
+}
 
 export function Header() {
   const { isSignedIn, isLoaded } = useUser();
@@ -18,6 +29,7 @@ export function Header() {
     <header className="border-b bg-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <ConditionalSidebarTrigger />
           <AppName />
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
@@ -45,15 +57,6 @@ export function Header() {
                 </div>
               ) : (
                 <div className="flex items-center gap-1 sm:gap-3">
-                  <SignOutButton>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="text-xs sm:text-sm px-2 sm:px-3"
-                    >
-                      Sign out
-                    </Button>
-                  </SignOutButton>
                   <Button
                     asChild
                     variant="outline"

@@ -3,21 +3,37 @@ import type { Student } from "@/lib/types/student";
 import { connectDB } from "@/lib/database";
 import StudentModel from "@/lib/database/models/student";
 
+function getRiskCategory(
+  score: number
+): "good" | "safe" | "warning" | "critical" {
+  if (score >= 75) return "critical";
+  if (score >= 40) return "warning";
+  if (score >= 20) return "safe";
+  return "good";
+}
+
 function computeSummaryFromDocs(docs: any[]): DashboardSummary {
   const total = docs.length;
-  const atRisk = docs.filter((s) => s.riskLevel !== "safe").length;
-  const critical = docs.filter((s) => s.riskLevel === "critical").length;
+  const critical = docs.filter(
+    (s) => getRiskCategory(s.riskScore) === "critical"
+  ).length;
+  const atRisk = docs.filter(
+    (s) => getRiskCategory(s.riskScore) === "warning"
+  ).length;
+
   const riskDistribution = [
-    { level: "safe", count: docs.filter((s) => s.riskLevel === "safe").length },
+    { level: "critical", count: critical },
+    { level: "warning", count: atRisk, label: "Risk" },
     {
-      level: "warning",
-      count: docs.filter((s) => s.riskLevel === "warning").length,
+      level: "safe",
+      count: docs.filter((s) => getRiskCategory(s.riskScore) === "safe").length,
     },
     {
-      level: "critical",
-      count: docs.filter((s) => s.riskLevel === "critical").length,
+      level: "good",
+      count: docs.filter((s) => getRiskCategory(s.riskScore) === "good").length,
     },
   ];
+
   const recentAlerts = docs
     .filter((s) => s.riskLevel !== "safe")
     .slice(0, 5)
@@ -25,15 +41,55 @@ function computeSummaryFromDocs(docs: any[]): DashboardSummary {
       id: `a-${i}`,
       studentId: s.id,
       message: `${s.name} marked as ${s.riskLevel} (score ${s.riskScore})`,
-      level: s.riskLevel === "critical" ? "critical" : ("warning" as const),
+      level: s.riskLevel === "critical" ? "critical" : "warning",
       date: new Date().toISOString(),
     }));
+
+  const myScore = 75;
+  const teachingSubjects = [
+    { 
+      subject: 'DSA', 
+      attendance: '65%', 
+      marks: '57%', 
+      overallScore: '61%',
+      classes: [
+        { class: 'CSE 2A', attendance: '60%', marks: '55%', score: '58%' },
+        { class: 'CSE 2B', attendance: '70%', marks: '59%', score: '64%' },
+      ]
+    },
+    { 
+      subject: 'OOPs', 
+      attendance: '92%', 
+      marks: '82%', 
+      overallScore: '87%',
+      classes: [
+        { class: 'CSE 3C', attendance: '95%', marks: '85%', score: '90%' },
+      ]
+    },
+    { 
+      subject: 'AI/ML', 
+      attendance: '78%', 
+      marks: '69%', 
+      overallScore: '73%',
+      classes: [
+        { class: 'CSE 3A', attendance: '72%', marks: '65%', score: '69%' },
+        { class: 'CSE 3B', attendance: '84%', marks: '79%', score: '81%' },
+      ]
+    },
+  ];
+  const recentTrends = [
+    "3 students in CSE 4A missed 2 consecutive weeks",
+    "Arjun scored <40% in last two tests",
+  ];
   return {
     totalStudents: total,
     atRiskCount: atRisk,
     criticalCount: critical,
     recentAlerts,
     riskDistribution,
+    myScore,
+    teachingSubjects,
+    recentTrends,
   };
 }
 
