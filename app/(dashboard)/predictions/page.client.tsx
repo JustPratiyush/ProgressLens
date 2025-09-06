@@ -1,29 +1,30 @@
 "use client";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
-// The OutliersCard import has been removed
-import { AITrendsCard } from "@/components/dashboard/ai-trends-card";
-import { RiskTrajectoryChart } from "@/components/dashboard/risk-trajectory-chart";
+import { OutliersCard } from "@/components/dashboard/outliers-card";
+import { ModelOverview } from "@/components/predictions/model-overview";
+import { KeyFactorsChart } from "@/components/predictions/key-factors-chart";
 
-export default function AlertsClient() {
+export default function PredictionsClient() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <SidebarTrigger />
         <h1 className="text-2xl font-semibold tracking-tight">
-          All Alerts & Trends
+          Predictive Analytics
         </h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* The main content area now only contains the Risk Trajectory Chart. */}
+        {/* Main content on the left */}
         <div className="lg:col-span-2 space-y-6">
-          <RiskTrajectoryChart />
+          <ModelOverview />
+          <KeyFactorsChart />
         </div>
 
-        {/* The sidebar area on the right remains the same. */}
+        {/* Outlier card on the right */}
         <div className="lg:col-span-1 space-y-6">
-          <AITrendsCard />
+          <OutliersCard />
         </div>
       </div>
     </div>

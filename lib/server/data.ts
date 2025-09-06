@@ -35,15 +35,21 @@ function computeSummaryFromDocs(docs: any[]): DashboardSummary {
   ];
 
   const recentAlerts = docs
-    .filter((s) => s.riskLevel !== "safe")
+    .filter((s) => {
+      const riskCategory = getRiskCategory(s.riskScore);
+      return riskCategory === "warning" || riskCategory === "critical";
+    })
     .slice(0, 5)
-    .map((s, i) => ({
-      id: `a-${i}`,
-      studentId: s.id,
-      message: `${s.name} marked as ${s.riskLevel} (score ${s.riskScore})`,
-      level: s.riskLevel === "critical" ? "critical" : "warning",
-      date: new Date().toISOString(),
-    }));
+    .map((s, i) => {
+      const riskCategory = getRiskCategory(s.riskScore);
+      return {
+        id: `a-${i}`,
+        studentId: s.id,
+        message: `${s.name} marked as ${riskCategory} (score ${s.riskScore})`,
+        level: riskCategory === "critical" ? "critical" : "warning",
+        date: new Date().toISOString(),
+      };
+    });
 
   const myScore = 75;
   const teachingSubjects = [
@@ -230,28 +236,39 @@ export async function bulkUpsertStudents(
 ) {
   await connectDB();
   let processed = 0;
+  const errors: string[] = [];
+  
+  for (const [index, row] of rows.entries()) {
+    try {
+      const name = row[mapping.name];
+      if (!name) {
+        console.log(`Skipping row ${index + 1} because name is missing or unmapped.`);
+        continue;
+      }
+      const email = row[mapping.email] || "";
+      const candidateId = row["id"] || undefined;
+      const payload: Partial<Student> = {
+        id: candidateId,
+        name,
+        email,
+        class: row[mapping.class] || "",
+        riskScore: Number(row[mapping.riskScore] ?? 0),
+        attendance: Number(row[mapping.attendance] ?? 0),
+        averageGrade: Number(row[mapping.averageGrade] ?? 0),
+      };
 
-  for (const row of rows) {
-    const name = row[mapping.name];
-    if (!name) continue;
-
-    const email = row[mapping.email] || "";
-    const candidateId = row["id"] || undefined;
-
-    const payload: Partial<Student> = {
-      id: candidateId,
-      name,
-      email,
-      class: row[mapping.class] || "",
-      riskScore: Number(row[mapping.riskScore] ?? 0),
-      attendance: Number(row[mapping.attendance] ?? 0),
-      averageGrade: Number(row[mapping.averageGrade] ?? 0),
-    };
-
-    if (row[mapping.riskLevel]) {
-      const riskLevel = row[mapping.riskLevel].toLowerCase();
-      if (["safe", "warning", "critical"].includes(riskLevel)) {
-        payload.riskLevel = riskLevel as any;
+      if (row[mapping.riskLevel]) {
+        const riskLevel = row[mapping.riskLevel].toLowerCase();
+        if (["safe", "warning", "critical"].includes(riskLevel)) {
+          payload.riskLevel = riskLevel as any;
+        } else {
+          payload.riskLevel =
+            (payload.riskScore ?? 0) >= 75
+              ? "critical"
+              : (payload.riskScore ?? 0) >= 40
+              ? "warning"
+              : "safe";
+        }
       } else {
         payload.riskLevel =
           (payload.riskScore ?? 0) >= 75
@@ -260,54 +277,54 @@ export async function bulkUpsertStudents(
             ? "warning"
             : "safe";
       }
-    } else {
-      payload.riskLevel =
-        (payload.riskScore ?? 0) >= 75
-          ? "critical"
-          : (payload.riskScore ?? 0) >= 40
-          ? "warning"
-          : "safe";
-    }
 
-    if (row[mapping.lastActivity]) {
-      const d = new Date(row[mapping.lastActivity]);
-      payload.lastActivity = isNaN(d.getTime())
-        ? new Date().toISOString()
-        : d.toISOString();
-    } else {
-      payload.lastActivity = new Date().toISOString();
-    }
+      if (row[mapping.lastActivity]) {
+        const d = new Date(row[mapping.lastActivity]);
+        payload.lastActivity = isNaN(d.getTime())
+          ? new Date().toISOString()
+          : d.toISOString();
+      } else {
+        payload.lastActivity = new Date().toISOString();
+      }
 
-    // Upsert by "id" (preferred), else by email if available, else by name+class
-    const query: any = candidateId
-      ? { id: candidateId }
-      : email
-      ? { email }
-      : { name, class: payload.class };
+      const query: any = candidateId
+        ? { id: candidateId }
+        : email
+        ? { email }
+        : { name, class: payload.class };
 
-    await StudentModel.findOneAndUpdate(
-      query,
-      {
-        $set: {
-          name: payload.name,
-          email: payload.email,
-          class: payload.class,
-          riskLevel: payload.riskLevel,
-          riskScore: payload.riskScore,
-          attendance: payload.attendance,
-          averageGrade: payload.averageGrade,
-          lastActivity: new Date(payload.lastActivity as string),
+      await StudentModel.findOneAndUpdate(
+        query,
+        {
+          $set: {
+            name: payload.name,
+            email: payload.email,
+            class: payload.class,
+            riskLevel: payload.riskLevel,
+            riskScore: payload.riskScore,
+            attendance: payload.attendance,
+            averageGrade: payload.averageGrade,
+            lastActivity: new Date(payload.lastActivity as string),
+          },
+          $setOnInsert: {
+            id: candidateId || `s-${Math.random().toString(36).slice(2, 8)}`,
+            interventions: [],
+          },
         },
-        $setOnInsert: {
-          id: candidateId || `s-${Math.random().toString(36).slice(2, 8)}`,
-          interventions: [],
-        },
-      },
-      { upsert: true, new: true }
-    );
-
-    processed++;
+        { upsert: true, new: true }
+      );
+      processed++;
+    } catch (error) {
+      // This will catch and log the error for the specific row that failed.
+      console.error(`🔴 FAILED TO PROCESS ROW ${index + 1}:`, row);
+      console.error("ERROR DETAILS:", error);
+      errors.push(`Row ${index + 1}: ${(error as Error).message}`);
+    }
   }
 
+  console.log(`✅ Processed ${processed} rows successfully.`);
+  if (errors.length > 0) {
+    console.error("Errors encountered:", errors);
+  }
   return processed;
 }
