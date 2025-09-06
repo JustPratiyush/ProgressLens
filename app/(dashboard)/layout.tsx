@@ -5,23 +5,16 @@ import { AppSidebar } from "@/components/layout/sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import ChatWidget from "@/components/dashboard/ChatWidget";
 
+// Force dynamic rendering for all dashboard routes
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  let user;
-  try {
-    user = await currentUser();
-  } catch (error) {
-    console.error("Clerk authentication error:", error);
-    // For development, continue without authentication
-    user = { id: "dev-user" };
-  }
-
-  if (!user) {
-    redirect("/sign-in");
-  }
+  // Skip authentication for development
+  const user = { id: "dev-user" };
 
   return (
     <SidebarProvider>

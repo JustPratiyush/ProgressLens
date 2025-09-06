@@ -46,7 +46,7 @@ function computeSummaryFromDocs(docs: any[]): DashboardSummary {
         id: `a-${i}`,
         studentId: s.id,
         message: `${s.name} marked as ${riskCategory} (score ${s.riskScore})`,
-        level: riskCategory === "critical" ? "critical" : "warning",
+        level: (riskCategory === "critical" ? "critical" : "warning") as "critical" | "warning",
         date: new Date().toISOString(),
       };
     });
@@ -131,16 +131,16 @@ export async function getStudentById(id: string): Promise<Student | null> {
   const d = await StudentModel.findOne({ id }).lean();
   if (!d) return null;
   return {
-    id: d.id,
-    name: d.name,
-    email: d.email ?? "",
-    class: d.class ?? "",
-    riskLevel: d.riskLevel as any,
-    riskScore: d.riskScore ?? 0,
-    attendance: d.attendance ?? 0,
-    averageGrade: d.averageGrade ?? 0,
-    lastActivity: d.lastActivity
-      ? new Date(d.lastActivity).toISOString()
+    id: (d as any).id,
+    name: (d as any).name,
+    email: (d as any).email ?? "",
+    class: (d as any).class ?? "",
+    riskLevel: (d as any).riskLevel as any,
+    riskScore: (d as any).riskScore ?? 0,
+    attendance: (d as any).attendance ?? 0,
+    averageGrade: (d as any).averageGrade ?? 0,
+    lastActivity: (d as any).lastActivity
+      ? new Date((d as any).lastActivity).toISOString()
       : new Date().toISOString(),
     mentor: (d as any).mentor,
     interventions: (d as any).interventions ?? [],
@@ -197,16 +197,16 @@ export async function updateStudent(id: string, updates: Partial<Student>) {
   ).lean();
   if (!d) return null;
   return {
-    id: d.id,
-    name: d.name,
-    email: d.email ?? "",
-    class: d.class ?? "",
-    riskLevel: d.riskLevel as any,
-    riskScore: d.riskScore ?? 0,
-    attendance: d.attendance ?? 0,
-    averageGrade: d.averageGrade ?? 0,
-    lastActivity: d.lastActivity
-      ? new Date(d.lastActivity).toISOString()
+    id: (d as any).id,
+    name: (d as any).name,
+    email: (d as any).email ?? "",
+    class: (d as any).class ?? "",
+    riskLevel: (d as any).riskLevel as any,
+    riskScore: (d as any).riskScore ?? 0,
+    attendance: (d as any).attendance ?? 0,
+    averageGrade: (d as any).averageGrade ?? 0,
+    lastActivity: (d as any).lastActivity
+      ? new Date((d as any).lastActivity).toISOString()
       : new Date().toISOString(),
     mentor: (d as any).mentor,
     interventions: (d as any).interventions ?? [],
